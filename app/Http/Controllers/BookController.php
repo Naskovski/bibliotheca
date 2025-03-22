@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
+use Inertia\Inertia;
 
 class BookController extends Controller
 {
@@ -21,7 +22,7 @@ class BookController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Books/Create');
     }
 
     /**
@@ -29,7 +30,15 @@ class BookController extends Controller
      */
     public function store(StoreBookRequest $request)
     {
-        //
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'first_published_date' => 'nullable|date',
+            'author_id' => 'required|exists:authors,id',
+        ]);
+
+        Book::create($request->all());
+
+        return redirect()->route('books.create')->with('success', 'Book created successfully!');
     }
 
     /**

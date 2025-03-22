@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('book_editions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('book_id')->constrained()->onDelete('cascade'); // Linked to books
-            $table->foreignId('publisher_id')->constrained()->onDelete('cascade'); // Linked to publishers
+            $table->foreignId('book_id')->constrained()->onDelete('cascade');
+            $table->foreignId('publisher_id')->constrained()->onDelete('cascade');
             $table->string('isbn')->unique();
             $table->date('published_date');
+            $table->string('photo_url')->nullable();
             $table->timestamps();
         });
     }

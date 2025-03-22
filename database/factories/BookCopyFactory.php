@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\BookEdition;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,11 @@ class BookCopyFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'book_edition_id' => BookEdition::factory(),
+            'barcode' => $this->faker->unique()->isbn13,
+            'status' => $this->faker->randomElement(['available', 'leased', 'lost']),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }

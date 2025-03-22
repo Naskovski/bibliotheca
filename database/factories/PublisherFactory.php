@@ -17,7 +17,11 @@ class PublisherFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => $this->faker->company,
+            'address' => $this->faker->address,
+            'phone' => $this->faker->phoneNumber,
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }
