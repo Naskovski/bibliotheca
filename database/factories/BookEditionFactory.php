@@ -23,7 +23,7 @@ class BookEditionFactory extends Factory
             'publisher_id' => Publisher::factory(),
             'isbn' => $this->faker->unique()->isbn13,
             'published_date' => $this->faker->date,
-            'photo_url' => $this->faker->imageUrl(640, 480, 'books'),
+            'photo_url' => $this->faker->imageUrl(640, 480, 'Books'),
             'created_at' => now(),
             'updated_at' => now(),
         ];

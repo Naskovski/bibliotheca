@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Author;
 use App\Models\Book;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
@@ -14,15 +15,22 @@ class BookController extends Controller
      */
     public function index()
     {
-        //
+        $books = \App\Models\Book::all();
+        return \Inertia\Inertia::render('Books/Index', [
+            'books' => $books,
+        ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): \Inertia\Response
     {
-        return Inertia::render('Books/Create');
+//        $authors = Author::all();
+
+        return Inertia::render('Books/New', [
+            'authors' => Author::all()
+        ]);
     }
 
     /**
@@ -38,7 +46,7 @@ class BookController extends Controller
 
         Book::create($request->all());
 
-        return redirect()->route('books.create')->with('success', 'Book created successfully!');
+        return redirect()->route('Books.create')->with('success', 'Book created successfully!');
     }
 
     /**

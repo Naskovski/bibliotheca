@@ -13,7 +13,10 @@ class BookEditionController extends Controller
      */
     public function index()
     {
-        //
+        $books = \App\Models\BookEdition::with(['book.author', 'publisher'])->paginate(15);
+        return \Inertia\Inertia::render('Books/Index', [
+            'books' => $books,
+        ]);
     }
 
     /**

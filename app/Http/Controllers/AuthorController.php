@@ -5,15 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\Author;
 use App\Http\Requests\StoreAuthorRequest;
 use App\Http\Requests\UpdateAuthorRequest;
+use Inertia\Inertia;
 
 class AuthorController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): \Inertia\Response
     {
-        //
+        $authors = Author::all();
+
+        return Inertia::render('Authors/Index', [
+            'authors' => $authors
+        ]);
     }
 
     /**
