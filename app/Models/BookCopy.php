@@ -9,4 +9,14 @@ class BookCopy extends Model
 {
     /** @use HasFactory<\Database\Factories\BookCopyFactory> */
     use HasFactory;
+
+    public function bookEdition()
+    {
+        return $this->belongsTo(BookEdition::class);
+    }
+
+    public function leases()
+    {
+        return $this->hasMany(Lease::class);
+    }
 }

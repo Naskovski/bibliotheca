@@ -15,7 +15,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    Route::get('/books', [BookEditionController::class, 'index'])->name('books.index');
+    Route::post('/books/editions/{bookEdition}/request', [BookEditionController::class, 'requestCopy'])
+        ->middleware('auth')
+        ->name('bookEditions.request');
+
+
 });
 
 require __DIR__.'/settings.php';
@@ -24,6 +28,8 @@ require __DIR__.'/auth.php';
 // Book
 Route::get('/Books/create', [BookController::class, 'create'])->name('Books.create');
 
+Route::get('/books', [BookEditionController::class, 'index'])->name('books.index');
+Route::get('/books/editions/{bookEdition}', [BookEditionController::class, 'show'])->name('bookEditions.show');
 
 // Author
 Route::get('/authors', [AuthorController::class, 'index']);

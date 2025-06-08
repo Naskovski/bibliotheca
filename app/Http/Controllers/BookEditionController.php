@@ -40,7 +40,19 @@ class BookEditionController extends Controller
      */
     public function show(BookEdition $bookEdition)
     {
-        //
+        $bookEdition->load(['book.author', 'publisher']);
+
+        // Count available copies (not leased)
+        $copies_left = $bookEdition->bookCopies()
+            ->whereDoesntHave('leases', function ($q) {
+                $q->whereNull('returned_at');
+            })
+            ->count();
+
+        return \Inertia\Inertia::render('Books/Show', [
+            'bookEdition' => $bookEdition,
+            'copies_left' => $copies_left,
+        ]);
     }
 
     /**
@@ -65,5 +77,26 @@ class BookEditionController extends Controller
     public function destroy(BookEdition $bookEdition)
     {
         //
+    }
+
+    public function requestCopy(BookEdition $bookEdition)
+    {
+        $copy = $bookEdition->bookCopies()
+            ->whereDoesntHave('leases', function ($q) {
+                $q->whereNull('returned_at');
+            })
+            ->first();
+
+        if (!$copy) {
+            return back()->withErrors(['No available copies.']);
+        }
+
+        $copy->leases()->create([
+            'user_id' => auth()->id(),
+            'leased_at' => now(),
+            // add other fields as needed
+        ]);
+
+        return back()->with('success', 'Book requested successfully!');
     }
 }

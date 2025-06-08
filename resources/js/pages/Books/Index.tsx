@@ -12,14 +12,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Index({ books }) {
-    useEffect(() => {
-        console.log('Books:', books);
-    }, [books]);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Books" />
-            <section className="flex flex-wrap justify-center gap-4 py-12">
+            <section className="flex flex-wrap justify-center items-stretch gap-4 py-12">
                 {books?.data?.length > 0
                     ? books.data.map((bookEdition) => <BookCard key={bookEdition.id} bookEdition={bookEdition} />)
                     : 'no books found'}
