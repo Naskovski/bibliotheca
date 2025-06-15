@@ -42,16 +42,31 @@ class BookEditionController extends Controller
     {
         $bookEdition->load(['book.author', 'publisher']);
 
-        // Count available copies (not leased)
         $copies_left = $bookEdition->bookCopies()
             ->whereDoesntHave('leases', function ($q) {
                 $q->whereNull('returned_at');
             })
             ->count();
 
+        // Other editions of the same book (excluding current edition)
+        $otherEditionsOfBook = BookEdition::with(['book.author', 'publisher'])
+            ->where('book_id', $bookEdition->book_id)
+            ->where('id', '!=', $bookEdition->id)
+            ->get();
+
+        // Other BookEditions by the same author (excluding current book's editions)
+        $otherBookEditionsByAuthor = BookEdition::with(['book.author', 'publisher'])
+            ->whereHas('book', function ($q) use ($bookEdition) {
+                $q->where('author_id', $bookEdition->book->author_id)
+                    ->where('id', '!=', $bookEdition->book_id);
+            })
+            ->get();
+
         return \Inertia\Inertia::render('Books/Show', [
             'bookEdition' => $bookEdition,
             'copies_left' => $copies_left,
+            'otherEditionsOfBook' => $otherEditionsOfBook,
+            'otherBookEditionsByAuthor' => $otherBookEditionsByAuthor,
         ]);
     }
 

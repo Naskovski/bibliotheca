@@ -14,6 +14,7 @@ export type Book = {
     created_at: string;
     updated_at: string;
     author: Author;
+    description: string | null;
 };
 
 export type Publisher = {

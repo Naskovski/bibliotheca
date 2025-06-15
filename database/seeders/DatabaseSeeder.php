@@ -33,5 +33,7 @@ class DatabaseSeeder extends Seeder
         lease::factory(3)->create();
         publisher::factory(5)->create();
 
+        $this->call(\Database\Seeders\LeaseSeeder::class);
+
     }
 }
