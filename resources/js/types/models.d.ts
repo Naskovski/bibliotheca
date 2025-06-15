@@ -38,3 +38,10 @@ export type BookEdition = {
     book: Book;
     publisher: Publisher;
 };
+
+export type User = {
+    id: number;
+    name: string;
+    email: string;
+    role: 'client' | 'librarian';
+}
