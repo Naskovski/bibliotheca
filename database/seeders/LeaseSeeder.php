@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\BookCopy;
 use App\Models\Lease;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class LeaseSeeder extends Seeder
@@ -17,15 +16,19 @@ class LeaseSeeder extends Seeder
     {
         $userIds = User::pluck('id')->all();
         $bookCopyIds = BookCopy::pluck('id')->all();
-        $statuses = ['active', 'returned', 'overdue'];
+        $statuses = [
+            'requested',
+            'approved',
+            'collected',
+            'returned',
+            'overdue',
+            'cancelled'
+        ];
 
         for ($i = 0; $i < 220; $i++) {
             $leaseDate = now()->subDays(fake()->numberBetween(1, 30));
-            $isReturned = fake()->boolean(60);
-            $returnDate = $isReturned ? (clone $leaseDate)->addDays(fake()->numberBetween(1, 30)) : null;
-            $status = $isReturned
-                ? fake()->randomElement(['returned', 'overdue'])
-                : 'active';
+            $returnDate = fake()->boolean(60) ? (clone $leaseDate)->addDays(fake()->numberBetween(1, 30)) : null;
+            $status = fake()->randomElement($statuses);
 
             Lease::create([
                 'client_id' => fake()->randomElement($userIds),
