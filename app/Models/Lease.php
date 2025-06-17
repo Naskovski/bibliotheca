@@ -27,4 +27,9 @@ class Lease extends Model
         'lease_date' => 'date',
         'return_date' => 'date',
     ];
+
+    public function bookCopy()
+    {
+        return $this->belongsTo(BookCopy::class);
+    }
 }

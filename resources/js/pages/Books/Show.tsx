@@ -5,6 +5,8 @@ import type { BreadcrumbItem } from '@/types';
 import { BookEdition, User } from '@/types/models';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { toast } from "sonner"
 
 interface ShowProps {
     bookEdition: BookEdition;
@@ -15,7 +17,13 @@ interface ShowProps {
 
 export default function Show({ bookEdition, copies_left, otherEditionsOfBook, otherBookEditionsByAuthor }: ShowProps) {
     const { post, setData, processing } = useForm({ book_edition_id: bookEdition.id });
-    const { auth } = usePage().props as { auth: { user: User } };
+    const { auth, errors, success } = usePage().props as {
+        auth: { user: User },
+        errors: Record<string, string[]>,
+        success?: string
+    };
+
+    const successShown = useRef(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -31,8 +39,25 @@ export default function Show({ bookEdition, copies_left, otherEditionsOfBook, ot
         },
     ];
 
+    useEffect(() => {
+        if (errors.book) {
+            toast.error(<span className="text-red-900 dark:text-red-200">
+                {errors.book || 'An error occurred while processing your request.'}
+            </span>)
+        }
+    }, [errors]);
+
+    useEffect(() => {
+        console.log('success:', success);
+        if (success && !successShown.current) {
+            toast.success(<span className="text-green-900 dark:text-green-300">
+                {success || 'Successfully requested the book edition.'}
+            </span>);
+            successShown.current = true;
+        }
+    }, [success]);
+
     const handleRequest = () => {
-        console.log('Requesting book edition:', bookEdition.id);
         setData('book_edition_id', bookEdition.id);
         post(route('leases.store'));
     };
@@ -53,11 +78,15 @@ export default function Show({ bookEdition, copies_left, otherEditionsOfBook, ot
                     {auth.user.role === 'client' && (
                         <div className="mx-auto mt-6 flex flex-wrap items-center justify-center gap-4">
                             <button
-                                className="bg-primary text-primary-foreground rounded-lg px-4 py-2 shadow transition hover:shadow-lg disabled:opacity-50"
+                                className="bg-primary text-primary-foreground cursor-pointer rounded-lg px-4 py-2 shadow transition hover:shadow-lg disabled:opacity-50"
                                 onClick={handleRequest}
-                                disabled={copies_left < 1 || processing}
+                                disabled={copies_left < 1 || processing || successShown.current}
                             >
-                                {copies_left > 0 ? 'Request Book' : 'No Copies Available'}
+                                {copies_left > 0
+                                    ? successShown.current
+                                        ? 'Book Requested'
+                                        : 'Request Book'
+                                    : 'No Copies Available'}
                             </button>
                             <Link href="/books" className="text-primary underline">
                                 Back to list

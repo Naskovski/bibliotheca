@@ -45,3 +45,24 @@ export type User = {
     email: string;
     role: 'client' | 'librarian';
 }
+
+export type BookCopy = {
+    id: number;
+    book_edition_id: number;
+    barcode: string;
+    status: 'available' | 'leased' | 'lost';
+    created_at: string;
+    updated_at: string;
+};
+
+export type Lease = {
+    id: number;
+    client_id: number;
+    librarian_id: number | null;
+    book_copy_id: number | null;
+    lease_date: string | null;
+    return_date: string | null;
+    status: 'requested' | 'approved' | 'collected' | 'returned' | 'overdue' | 'cancelled';
+    created_at: string;
+    updated_at: string;
+};

@@ -26,6 +26,9 @@ class AppServiceProvider extends ServiceProvider
                     'user' => $user ? $user->only(['id', 'name', 'email', 'role']) : null,
                 ];
             },
+            'success' => function () {
+                return session('success');
+            },
         ]);
     }
 }

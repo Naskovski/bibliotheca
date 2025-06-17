@@ -39,6 +39,21 @@ class LeaseController extends Controller
 
         $bookEdition = BookEdition::findOrFail($request->book_edition_id);
 
+        $existingLease = Lease::where('client_id', auth()->id())
+            ->whereHas('bookCopy', function ($q) use ($bookEdition) {
+                $q->where('book_edition_id', $bookEdition->id);
+            })
+            ->whereIn('status', ['requested', 'approved', 'collected', 'overdue'])
+            ->first();
+
+        if ($existingLease) {
+            Log::warning('User already has an active/requested lease for this book edition', [
+                'client_id' => auth()->id(),
+                'book_edition_id' => $bookEdition->id,
+            ]);
+            return back()->withErrors(['book' => 'You have already requested or leased this book edition.']);
+        }
+
         $availableCopy = $bookEdition->bookCopies()
             ->whereDoesntHave('leases', function ($q) {
                 $q->whereIn('status', ['requested', 'approved', 'collected', 'overdue']);
@@ -79,8 +94,8 @@ class LeaseController extends Controller
             'book_copy_id' => $availableCopy->id,
         ]);
 
-        return redirect()->route('bookEditions.show', $bookEdition->id)
-            ->with('success', 'Book requested successfully.');
+
+        return back()->with('success', 'Book requested successfully.');
     }
 
     /**
