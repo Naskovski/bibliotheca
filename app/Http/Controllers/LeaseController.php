@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BookEdition;
 use App\Models\Lease;
 use App\Http\Requests\StoreLeaseRequest;
 use App\Http\Requests\UpdateLeaseRequest;
+use Illuminate\Support\Facades\Log;
 
 class LeaseController extends Controller
 {
@@ -27,9 +29,58 @@ class LeaseController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    // app/Http/Controllers/LeaseController.php
     public function store(StoreLeaseRequest $request)
     {
-        //
+        Log::info('Lease request initiated', [
+            'client_id' => auth()->id(),
+            'book_edition_id' => $request->book_edition_id,
+        ]);
+
+        $bookEdition = BookEdition::findOrFail($request->book_edition_id);
+
+        $availableCopy = $bookEdition->bookCopies()
+            ->whereDoesntHave('leases', function ($q) {
+                $q->whereIn('status', ['requested', 'approved', 'collected', 'overdue']);
+            })
+            ->first();
+
+        $copiesLeft = $bookEdition->bookCopies()->count();
+
+        Log::info('Book edition checked', [
+            'book_edition_id' => $bookEdition->id,
+            'copies_left' => $copiesLeft,
+            'available_copy_id' => $availableCopy ? $availableCopy->id : null,
+        ]);
+
+        if (!$availableCopy) {
+            Log::warning('No available book copies for lease', [
+                'book_edition_id' => $bookEdition->id,
+                'copies_left' => $copiesLeft,
+            ]);
+            return back()->withErrors(['book' => 'No available book copies.']);
+        }
+
+        $leaseData = [
+            'client_id' => auth()->id(),
+            'librarian_id' => null,
+            'book_copy_id' => $availableCopy->id,
+            'lease_date' => now(),
+            'status' => 'requested',
+        ];
+
+        Log::info('Creating lease', $leaseData);
+
+        Lease::create($leaseData);
+
+        Log::info('Lease created successfully', [
+            'client_id' => auth()->id(),
+            'book_edition_id' => $bookEdition->id,
+            'book_copy_id' => $availableCopy->id,
+        ]);
+
+        return redirect()->route('bookEditions.show', $bookEdition->id)
+            ->with('success', 'Book requested successfully.');
     }
 
     /**

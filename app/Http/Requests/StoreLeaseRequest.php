@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreLeaseRequest extends FormRequest
@@ -11,7 +12,10 @@ class StoreLeaseRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        Log::info('Checking authorization for lease request', [
+            'client_id' => auth()->id(),
+        ]);
+        return auth()->check();
     }
 
     /**
@@ -21,8 +25,12 @@ class StoreLeaseRequest extends FormRequest
      */
     public function rules(): array
     {
+        Log::info('Validating lease request', [
+            'client_id' => auth()->id(),
+            'book_edition_id' => $this->book_edition_id,
+        ]);
         return [
-            //
+            'book_edition_id' => ['required', 'exists:book_editions,id'],
         ];
     }
 }

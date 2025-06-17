@@ -9,7 +9,7 @@ import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Books',
+        title: 'Browse Books',
         href: '/books',
         icon: BookOpen,
     },

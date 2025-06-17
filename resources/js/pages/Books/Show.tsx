@@ -11,11 +11,10 @@ interface ShowProps {
     copies_left: number;
     otherEditionsOfBook: BookEdition[];
     otherBookEditionsByAuthor: BookEdition[];
-    5;
 }
 
 export default function Show({ bookEdition, copies_left, otherEditionsOfBook, otherBookEditionsByAuthor }: ShowProps) {
-    const { post, processing } = useForm();
+    const { post, setData, processing } = useForm({ book_edition_id: bookEdition.id });
     const { auth } = usePage().props as { auth: { user: User } };
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -33,7 +32,9 @@ export default function Show({ bookEdition, copies_left, otherEditionsOfBook, ot
     ];
 
     const handleRequest = () => {
-        post(route('bookEditions.request', bookEdition.id));
+        console.log('Requesting book edition:', bookEdition.id);
+        setData('book_edition_id', bookEdition.id);
+        post(route('leases.store'));
     };
 
     return (

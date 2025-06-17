@@ -3,6 +3,7 @@
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\BookEditionController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\LeaseController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -15,10 +16,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    Route::post('/books/editions/{bookEdition}/request', [BookEditionController::class, 'requestCopy'])
-        ->middleware('auth')
-        ->name('bookEditions.request');
 
+    Route::post('/leases', [LeaseController::class, 'store'])->name('leases.store');
 
 });
 
