@@ -48,7 +48,6 @@ export default function Show({ bookEdition, copies_left, otherEditionsOfBook, ot
     }, [errors]);
 
     useEffect(() => {
-        console.log('success:', success);
         if (success && !successShown.current) {
             toast.success(<span className="text-green-900 dark:text-green-300">
                 {success || 'Successfully requested the book edition.'}

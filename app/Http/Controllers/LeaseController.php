@@ -31,7 +31,7 @@ class LeaseController extends Controller
             \Log::info('Client leases fetched', ['user_id' => $user->id]);
         } elseif ($user->role === 'librarian') {
             foreach ($statuses as $status) {
-                $leasesByStatus[$status] = Lease::with(['bookCopy.bookEdition.book.author'])
+                $leasesByStatus[$status] = Lease::with(['bookCopy.bookEdition.book.author', 'client'])
                     ->where('status', $status)
                     ->latest()
                     ->paginate(10, ['*'], $status . '_page');

@@ -32,4 +32,14 @@ class Lease extends Model
     {
         return $this->belongsTo(BookCopy::class);
     }
+
+    public function librarian()
+    {
+        return $this->belongsTo(User::class, 'librarian_id');
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(User::class, 'client_id');
+    }
 }

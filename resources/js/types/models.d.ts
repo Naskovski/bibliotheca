@@ -59,6 +59,7 @@ export type BookCopy = {
 export type Lease = {
     id: number;
     client_id: number;
+    client: User | null;
     librarian_id: number | null;
     book_copy_id: number | null;
     book_copy: BookCopy | null;

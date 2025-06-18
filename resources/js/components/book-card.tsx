@@ -20,10 +20,7 @@ export function BookCard({
     className?: string;
     size?: BookCardSize;
     children?: ReactNode;
-}) {    useEffect(() => {
-        console.log('Book Edition:', bookEdition);
-    }, []);
-
+}) {
     const { card, image } = sizeClasses[size];
 
     return (
