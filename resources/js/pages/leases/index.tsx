@@ -6,6 +6,7 @@ import Scroller from '@/components/scroller';
 import { Lease } from '@/types/models';
 import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
+import Loader from '@/components/ui/loader';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -149,37 +150,35 @@ export default function Index(props: any) {
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="My Books" />
-            <section className="py-12">
-                {statusOrder.map((status) => {
-                    const statusData = leasesByStatus[status];
-                    const leases = statusData?.data || [];
-                    if (!leases.length) return null;
+        <>
 
-                    return (
-                        <div key={status} className="mb-10">
-                            <h2 className="mb-4 text-xl font-bold">{statusLabels[status]}</h2>
-                            <Scroller variant="horizontal" className="block">
-                                {leases.map((lease: Lease) => (
-                                    <BookCard
-                                        key={lease.id}
-                                        bookEdition={lease.book_copy.book_edition}
-                                    >
-                                        {extraData(status, lease)}
-                                    </BookCard>
-                                ))}
-                            </Scroller>
-                        </div>
-                    );
-                })}
-                {statusOrder.every(
-                    (status) =>
-                        !leasesByStatus[status] ||
-                        !leasesByStatus[status].data ||
-                        leasesByStatus[status].data.length === 0,
-                ) && <div className="text-center text-gray-500">No leases found</div>}
-            </section>
-        </AppLayout>
+            <AppLayout breadcrumbs={breadcrumbs}>
+                <Head title="My Books" />
+                {processing && <Loader />}
+                <section className="py-12">
+                    {statusOrder.map((status) => {
+                        const statusData = leasesByStatus[status];
+                        const leases = statusData?.data || [];
+                        if (!leases.length) return null;
+
+                        return (
+                            <div key={status} className="mb-10">
+                                <h2 className="mb-4 text-xl font-bold">{statusLabels[status]}</h2>
+                                <Scroller variant="horizontal" className="block">
+                                    {leases.map((lease: Lease) => (
+                                        <BookCard key={lease.id} bookEdition={lease.book_copy.book_edition}>
+                                            {extraData(status, lease)}
+                                        </BookCard>
+                                    ))}
+                                </Scroller>
+                            </div>
+                        );
+                    })}
+                    {statusOrder.every(
+                        (status) => !leasesByStatus[status] || !leasesByStatus[status].data || leasesByStatus[status].data.length === 0,
+                    ) && <div className="text-center text-gray-500">No leases found</div>}
+                </section>
+            </AppLayout>
+        </>
     );
 }
