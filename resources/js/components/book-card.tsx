@@ -1,6 +1,6 @@
 import { BookEdition } from '@/types/models';
 import { Link } from '@inertiajs/react';
-import { useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
 
 type BookCardSize = 'small' | 'medium' | 'large';
 
@@ -10,9 +10,17 @@ const sizeClasses: Record<BookCardSize, { card: string; image: string }> = {
     large: { card: 'w-80 p-6', image: 'w-72' },
 };
 
-export function BookCard({ bookEdition, className = '', size = 'medium' }:
-                             { bookEdition: BookEdition; className?: string; size?: BookCardSize }) {
-    useEffect(() => {
+export function BookCard({
+                             bookEdition,
+                             className = '',
+                             size = 'medium',
+                             children,
+                         }: {
+    bookEdition: BookEdition;
+    className?: string;
+    size?: BookCardSize;
+    children?: ReactNode;
+}) {    useEffect(() => {
         console.log('Book Edition:', bookEdition);
     }, []);
 
@@ -21,9 +29,11 @@ export function BookCard({ bookEdition, className = '', size = 'medium' }:
     return (
         <Link
             href={route('bookEditions.show', bookEdition.id)}
-            className={`acrylic tems-start  flex flex-col rounded-lg align-middle items-center shadow-sm transition-transform duration-200 hover:scale-105 hover:shadow-[0_0_24px_4px_rgba(255,255,255,0.3)] ${card} ${className}`}
+            className={`acrylic flex flex-col gap-2 justify-start rounded-lg align-middle items-center shadow-sm
+            transition-transform duration-200 hover:scale-105 hover:shadow-[0_0_24px_4px_rgba(255,255,255,0.3)]
+            ${card} ${className}`}
         >
-            <div className={`relative mb-4 aspect-[3/4] ${image}`}>
+            <div className={`relative aspect-[3/4] ${image}`}>
                 <img
                     src={bookEdition.photo_url + '?w=400&q=50&fm=webp'}
                     alt={bookEdition.book.title}
@@ -42,6 +52,7 @@ export function BookCard({ bookEdition, className = '', size = 'medium' }:
                 {bookEdition.book.author.name} &middot;{' '}
                 {new Date(bookEdition.book.first_published_date).toLocaleDateString(undefined, { year: 'numeric' })}
             </p>
+            {children}
         </Link>
     );
 }

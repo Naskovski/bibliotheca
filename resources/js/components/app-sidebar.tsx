@@ -19,8 +19,8 @@ const mainNavItems: NavItem[] = [
         icon: UserRound,
     },
     {
-        title: 'Categories',
-        href: '/categories',
+        title: 'My Leases',
+        href: '/lease',
         icon: Rows3,
     },
 ];

@@ -7,6 +7,7 @@ use App\Models\Lease;
 use App\Http\Requests\StoreLeaseRequest;
 use App\Http\Requests\UpdateLeaseRequest;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 
 class LeaseController extends Controller
 {
@@ -15,7 +16,38 @@ class LeaseController extends Controller
      */
     public function index()
     {
-        //
+        $user = auth()->user();
+        $statuses = ['requested', 'approved', 'collected', 'overdue', 'returned', 'cancelled'];
+        $leasesByStatus = [];
+
+        if ($user->role === 'client') {
+            foreach ($statuses as $status) {
+                $leasesByStatus[$status] = Lease::with(['bookCopy.bookEdition.book.author'])
+                    ->where('client_id', $user->id)
+                    ->where('status', $status)
+                    ->latest()
+                    ->paginate(10, ['*'], $status . '_page');
+            }
+            \Log::info('Client leases fetched', ['user_id' => $user->id]);
+        } elseif ($user->role === 'librarian') {
+            foreach ($statuses as $status) {
+                $leasesByStatus[$status] = Lease::with(['bookCopy.bookEdition.book.author'])
+                    ->where('status', $status)
+                    ->latest()
+                    ->paginate(10, ['*'], $status . '_page');
+                \Log::info('Librarian leases paginated', [
+                    'status' => $status,
+                    'page' => request()->get($status . '_page', 1),
+                ]);
+            }
+        } else {
+            \Log::warning('Unauthorized access to leases index', ['user_id' => $user->id]);
+            abort(403);
+        }
+
+        return inertia('leases/index', [
+            'leasesByStatus' => $leasesByStatus,
+        ]);
     }
 
     /**
@@ -119,8 +151,73 @@ class LeaseController extends Controller
      */
     public function update(UpdateLeaseRequest $request, Lease $lease)
     {
-        //
+        $validated = $request->validated();
+        $user = auth()->user();
+
+        Log::info('Lease update attempt', [
+            'user_id' => $user->id,
+            'lease_id' => $lease->id,
+            'requested_status' => $validated['status'] ?? null,
+            'current_status' => $lease->status,
+            'user_role' => $user->role,
+        ]);
+
+        if (isset($validated['status'])) {
+            $allowedStatuses = ['cancelled', 'requested', 'approved', 'collected', 'overdue', 'returned'];
+            if (!in_array($validated['status'], $allowedStatuses)) {
+                Log::warning('Invalid status update attempted', [
+                    'user_id' => $user->id,
+                    'lease_id' => $lease->id,
+                    'requested_status' => $validated['status'],
+                ]);
+                abort(400, 'Invalid status update.');
+            }
+            if ($user->role === 'client' && $lease->client_id === $user->id) {
+                if (
+                    ($validated['status'] === 'cancelled' && in_array($lease->status, ['requested', 'approved'])) ||
+                    ($validated['status'] === 'requested' && $lease->status === 'cancelled')
+                ) {
+                    $lease->status = $validated['status'];
+                    $lease->save();
+                    Log::info('Lease status updated by client', [
+                        'user_id' => $user->id,
+                        'lease_id' => $lease->id,
+                        'new_status' => $lease->status,
+                    ]);
+                    return back()->with('success', 'Lease status updated successfully.');
+                }
+                Log::warning('Unauthorized status transition by client', [
+                    'user_id' => $user->id,
+                    'lease_id' => $lease->id,
+                    'requested_status' => $validated['status'],
+                    'current_status' => $lease->status,
+                ]);
+                abort(403, 'Unauthorized status transition.');
+            }
+            if ($user->role === 'librarian') {
+                $lease->status = $validated['status'];
+                $lease->save();
+                Log::info('Lease status updated by librarian', [
+                    'user_id' => $user->id,
+                    'lease_id' => $lease->id,
+                    'new_status' => $lease->status,
+                ]);
+                return back()->with('success', 'Lease status updated successfully.');
+            }
+            Log::warning('Unauthorized lease update attempt', [
+                'user_id' => $user->id,
+                'lease_id' => $lease->id,
+                'user_role' => $user->role,
+            ]);
+            abort(403, 'Unauthorized to update this lease.');
+        }
+        Log::warning('No valid status provided for lease update', [
+            'user_id' => $user->id,
+            'lease_id' => $lease->id,
+        ]);
+        abort(400, 'Invalid status update.');
     }
+
 
     /**
      * Remove the specified resource from storage.

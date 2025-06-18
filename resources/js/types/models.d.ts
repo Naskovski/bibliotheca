@@ -49,6 +49,7 @@ export type User = {
 export type BookCopy = {
     id: number;
     book_edition_id: number;
+    book_edition: BookEdition;
     barcode: string;
     status: 'available' | 'leased' | 'lost';
     created_at: string;
@@ -60,6 +61,7 @@ export type Lease = {
     client_id: number;
     librarian_id: number | null;
     book_copy_id: number | null;
+    book_copy: BookCopy | null;
     lease_date: string | null;
     return_date: string | null;
     status: 'requested' | 'approved' | 'collected' | 'returned' | 'overdue' | 'cancelled';

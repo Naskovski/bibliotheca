@@ -18,6 +18,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
     Route::post('/leases', [LeaseController::class, 'store'])->name('leases.store');
+    Route::get('/leases', [LeaseController::class, 'index'])->name('leases.index');
+    Route::patch('/leases/{lease}', [LeaseController::class, 'update'])->name('leases.update');
 
 });
 
