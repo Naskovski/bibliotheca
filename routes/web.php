@@ -21,16 +21,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/leases', [LeaseController::class, 'index'])->name('leases.index');
     Route::patch('/leases/{lease}', [LeaseController::class, 'update'])->name('leases.update');
 
+    // BookEdition create/edit
+    Route::get('/book-editions/create', [BookEditionController::class, 'create'])->name('bookEditions.create');
+    Route::get('/book-editions/{bookEdition}/edit', [BookEditionController::class, 'edit'])->name('bookEditions.edit');
+    // BookEdition CRUD (librarian only, policy enforced)
+    Route::post('book-editions', [BookEditionController::class, 'store'])->name('bookEditions.store');
+    Route::put('book-editions/{bookEdition}', [BookEditionController::class, 'update'])->name('bookEditions.update');
+
+    // Book
+    Route::get('/Books/create', [BookController::class, 'create'])->name('books.create');
+    Route::get('/books/{book}/edit', [BookController::class, 'edit'])->name('books.edit');
+
+    // BookEdition CRUD (librarian only, policy enforced)
+    Route::post('books', [BookController::class, 'store'])->name('books.store');
+    Route::put('books/{book}', [BookController::class, 'update'])->name('books.update');
 });
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
 
-// Book
-Route::get('/Books/create', [BookController::class, 'create'])->name('Books.create');
 
 Route::get('/books', [BookEditionController::class, 'index'])->name('books.index');
-Route::get('/books/editions/{bookEdition}', [BookEditionController::class, 'show'])->name('bookEditions.show');
+Route::get('/book-editions/{bookEdition}', [BookEditionController::class, 'show'])->name('bookEditions.show');
 
 // Author
 Route::get('/authors', [AuthorController::class, 'index']);

@@ -11,7 +11,7 @@ class StoreBookEditionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user() && $this->user()->role === 'librarian';
     }
 
     /**
@@ -22,7 +22,11 @@ class StoreBookEditionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'book_id' => ['required', 'exists:books,id'],
+            'publisher_id' => ['required', 'exists:publishers,id'],
+            'isbn' => ['required', 'string', 'unique:book_editions,isbn'],
+            'published_date' => ['required', 'date'],
+            'photo_url' => ['nullable', 'string'],
         ];
     }
 }

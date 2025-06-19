@@ -10,6 +10,22 @@ class BookEdition extends Model
     /** @use HasFactory<\Database\Factories\BookEditionFactory> */
     use HasFactory;
 
+    protected $fillable = [
+        'book_id',
+        'publisher_id',
+        'isbn',
+        'published_date',
+        'photo_url',
+        'created_at',
+        'updated_at',
+    ];
+
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'published_date',
+    ];
+
     public function book()
     {
         return $this->belongsTo(Book::class);

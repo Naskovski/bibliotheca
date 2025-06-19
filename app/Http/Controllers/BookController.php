@@ -46,7 +46,7 @@ class BookController extends Controller
 
         Book::create($request->all());
 
-        return redirect()->route('Books.create')->with('success', 'Book created successfully!');
+        return redirect()->route('books.create')->with('success', 'Book created successfully!');
     }
 
     /**
@@ -62,7 +62,10 @@ class BookController extends Controller
      */
     public function edit(Book $book)
     {
-        //
+        return Inertia::render('Books/Edit', [
+            'book' => $book,
+            'authors' => Author::all(),
+        ]);
     }
 
     /**
@@ -70,7 +73,28 @@ class BookController extends Controller
      */
     public function update(UpdateBookRequest $request, Book $book)
     {
-        //
+        $data = $request->validated();
+
+        \Log::info('Updating book', [
+            'book_id' => $book->id,
+            'user_id' => auth()->id(),
+            'data' => $data,
+        ]);
+
+        $book->title = $data['title'];
+        $book->first_published_date = $data['first_published_date'] ?? null;
+        $book->description = $data['description'] ?? null;
+        $book->author_id = $data['author_id'];
+        $book->updated_at = now();
+        $book->save();
+
+        \Log::info('Book updated successfully', [
+            'book_id' => $book->id,
+            'user_id' => auth()->id(),
+        ]);
+
+        return redirect()->route('books.index')
+            ->with('success', 'Book updated successfully!');
     }
 
     /**

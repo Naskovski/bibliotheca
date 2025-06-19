@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\BookEdition;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Support\Facades\Log;
 
 class BookEditionPolicy
 {
@@ -29,7 +30,8 @@ class BookEditionPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        \Log::info('Checking if user can create BookEdition', ['user_id' => $user->id, 'role' => $user->role]);
+        return $user->role === 'librarian';
     }
 
     /**
@@ -37,7 +39,7 @@ class BookEditionPolicy
      */
     public function update(User $user, BookEdition $bookEdition): bool
     {
-        return false;
+        return $user->role === 'librarian';
     }
 
     /**
@@ -45,7 +47,7 @@ class BookEditionPolicy
      */
     public function delete(User $user, BookEdition $bookEdition): bool
     {
-        return false;
+        return $user->role === 'librarian';
     }
 
     /**

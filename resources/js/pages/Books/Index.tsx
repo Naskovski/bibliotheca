@@ -1,8 +1,10 @@
 import { BookCard } from '@/components/book-card';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/react';
-import { useEffect } from 'react';
+import { Head, router, usePage } from '@inertiajs/react';
+import { useEffect, useRef } from 'react';
+import { toast } from 'sonner';
+import { User } from '@/types/models';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -12,6 +14,18 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Index({ books }) {
+    const { success } = usePage().props as { success?: string };
+
+    const successShown = useRef(false);
+    useEffect(() => {
+        if (success && !successShown.current) {
+            toast.success(<span className="text-green-900 dark:text-green-300">
+                {success || 'Successfully completed the action!'}
+            </span>);
+            successShown.current = true;
+        }
+    }, [success]);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Books" />

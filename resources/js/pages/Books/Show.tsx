@@ -15,6 +15,22 @@ interface ShowProps {
     otherBookEditionsByAuthor: BookEdition[];
 }
 
+
+const adminLinks = [
+    {
+        title: 'Edit Book',
+        href: (bookEdition: BookEdition) => route('books.edit', bookEdition.book_id),
+    },
+    {
+        title: 'Edit Book Edition',
+        href: (bookEdition: BookEdition) => route('bookEditions.edit', bookEdition.id),
+    },
+    {
+        title: 'Edit Book Copies',
+        href: (bookEdition: BookEdition) => route('bookEditions.edit', bookEdition.id),
+    }
+];
+
 export default function Show({ bookEdition, copies_left, otherEditionsOfBook, otherBookEditionsByAuthor }: ShowProps) {
     const { post, setData, processing } = useForm({ book_edition_id: bookEdition.id });
     const { auth, errors, success } = usePage().props as {
@@ -27,15 +43,12 @@ export default function Show({ bookEdition, copies_left, otherEditionsOfBook, ot
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: (
-                <>
-                    <Link href="/books" className="mr-2 inline-block">
-                        <ArrowLeft className="inline h-4 w-4" />
-                    </Link>
-                    Details
-                </>
-            ),
-            href: '/books/editions/' + bookEdition.id,
+            title: 'Browse books',
+            href: '/books',
+        },
+        {
+            title: 'Details',
+            href: '/book-editions/' + bookEdition.id,
         },
     ];
 
@@ -74,22 +87,31 @@ export default function Show({ bookEdition, copies_left, otherEditionsOfBook, ot
                         />
                     </div>
 
-                    {auth.user.role === 'client' && (
+                    {auth.user.role === 'client' ? (
                         <div className="mx-auto mt-6 flex flex-wrap items-center justify-center gap-4">
                             <button
                                 className="bg-primary text-primary-foreground cursor-pointer rounded-lg px-4 py-2 shadow transition hover:shadow-lg disabled:opacity-50"
                                 onClick={handleRequest}
                                 disabled={copies_left < 1 || processing || successShown.current}
                             >
-                                {copies_left > 0
-                                    ? successShown.current
-                                        ? 'Book Requested'
-                                        : 'Request Book'
-                                    : 'No Copies Available'}
+                                {copies_left > 0 ? (successShown.current ? 'Book Requested' : 'Request Book') : 'No Copies Available'}
                             </button>
                             <Link href="/books" className="text-primary underline">
                                 Back to list
                             </Link>
+                        </div>
+                    ) : (
+                        <div className="mx-auto mt-6 flex flex-col items-center justify-start gap-4">
+                            {adminLinks.map((link) => (
+                                <Link
+                                    key={link.title}
+                                    className="bg-primary text-primary-foreground cursor-pointer rounded-lg px-4 py-2
+                                    shadow transition hover:shadow-lg disabled:opacity-50 w-full text-center"
+                                    href={link.href(bookEdition)}
+                                >
+                                    {link.title}
+                                </Link>
+                            ))}
                         </div>
                     )}
                 </div>

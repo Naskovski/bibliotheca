@@ -11,7 +11,7 @@ class UpdateBookRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user() && $this->user()->role === 'librarian';
     }
 
     /**
@@ -22,7 +22,10 @@ class UpdateBookRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => ['required', 'string', 'max:255'],
+            'first_published_date' => ['nullable', 'date'],
+            'author_id' => ['required', 'exists:authors,id'],
+            'description' => ['nullable', 'string'],
         ];
     }
 }

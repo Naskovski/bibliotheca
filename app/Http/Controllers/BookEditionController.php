@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BookEdition;
 use App\Http\Requests\StoreBookEditionRequest;
 use App\Http\Requests\UpdateBookEditionRequest;
+use Illuminate\Support\Facades\Log;
 
 class BookEditionController extends Controller
 {
@@ -24,7 +25,11 @@ class BookEditionController extends Controller
      */
     public function create()
     {
-        //
+        return \Inertia\Inertia::render('BookEditions/Create', [
+            'books' => \App\Models\Book::with('author')->get(),
+            'publishers' => \App\Models\Publisher::all(),
+            'authors' => \App\Models\Author::all(),
+        ]);
     }
 
     /**
@@ -32,7 +37,19 @@ class BookEditionController extends Controller
      */
     public function store(StoreBookEditionRequest $request)
     {
-        //
+        // Log the incoming request data
+        \Log::info('BookEditionController@store: incoming data', ['request' => $request->all()]);
+
+        $data = $request->validated();
+        $data['created_at'] = now();
+        $data['updated_at'] = now();
+
+        // Log the validated data before creation
+        \Log::info('BookEditionController@store: validated data', ['validated' => $data]);
+
+        $bookEdition = BookEdition::create($data);
+        \Log::info('BookEditionController@store: created BookEdition', ['bookEdition' => $bookEdition]);
+        return redirect()->route('books.index')->with('success', 'Book edition created successfully.');
     }
 
     /**
@@ -75,15 +92,33 @@ class BookEditionController extends Controller
      */
     public function edit(BookEdition $bookEdition)
     {
-        //
+        return \Inertia\Inertia::render('BookEditions/Edit', [
+            'bookEdition' => $bookEdition,
+            'books' => \App\Models\Book::with('author')->get(),
+            'publishers' => \App\Models\Publisher::all(),
+            'authors' => \App\Models\Author::all(),
+        ]);
     }
 
     /**
-     * Update the specified resource in storage.
-     */
+ * Update the specified resource in storage.
+ */
     public function update(UpdateBookEditionRequest $request, BookEdition $bookEdition)
     {
-        //
+        \Log::info('BookEditionController@update: validated data', [
+            'validated' => $request->validated(),
+            'bookEdition_id' => $bookEdition->id,
+        ]);
+
+        $data = $request->validated();
+        $data['updated_at'] = now();
+        $bookEdition->update($data);
+
+        \Log::info('BookEditionController@update: updated BookEdition', [
+            'bookEdition' => $bookEdition->fresh(),
+        ]);
+
+        return redirect()->route('books.index')->with('success', 'Book edition updated successfully.');
     }
 
     /**
@@ -91,7 +126,8 @@ class BookEditionController extends Controller
      */
     public function destroy(BookEdition $bookEdition)
     {
-        //
+        $bookEdition->delete();
+        return redirect()->route('books.index')->with('success', 'Book edition deleted successfully.');
     }
 
     public function requestCopy(BookEdition $bookEdition)
