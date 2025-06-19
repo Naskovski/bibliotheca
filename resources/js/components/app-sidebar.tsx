@@ -1,10 +1,28 @@
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroupLabel,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem
+} from '@/components/ui/sidebar';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Rows3, UserRound } from 'lucide-react';
+import {
+    BookOpen,
+    BuildingIcon,
+    Folder,
+    LayoutGrid,
+    PlusSquareIcon,
+    Rows3,
+    UserRound,
+    WavesLadderIcon
+} from 'lucide-react';
 import AppLogo from './app-logo';
 import { useEffect } from 'react';
 
@@ -13,11 +31,6 @@ const clientNavItems: NavItem[] = [
         title: 'Browse Books',
         href: '/books',
         icon: BookOpen,
-    },
-    {
-        title: 'Authors',
-        href: '/authors',
-        icon: UserRound,
     },
     {
         title: 'My Leases',
@@ -33,12 +46,17 @@ const librarianNavItems: NavItem[] = [
         icon: BookOpen,
     },
     {
-        title: 'Authors',
+        title: 'Manage Authors',
         href: '/authors',
         icon: UserRound,
     },
     {
-        title: 'Leases',
+        title: 'Manage Publishers',
+        href: '/publishers',
+        icon: BuildingIcon,
+    },
+    {
+        title: 'Manage Leases',
         href: '/leases',
         icon: Rows3,
     },
@@ -46,14 +64,14 @@ const librarianNavItems: NavItem[] = [
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
+        title: 'New Book',
+        href: '/books/create',
+        icon: PlusSquareIcon,
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits',
-        icon: BookOpen,
+        title: 'New Book Edition',
+        href: '/book-editions/create',
+        icon: PlusSquareIcon,
     },
 ];
 
@@ -81,7 +99,8 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+                <SidebarGroupLabel>Quick Links</SidebarGroupLabel>
+                {isLibrarian && <NavFooter items={footerNavItems} className="mt-auto" />}
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

@@ -25,7 +25,7 @@ const adminLinks = [
         href: (bookEdition: BookEdition) => route('bookEditions.edit', bookEdition.id),
     },
     {
-        title: 'Edit Book Copies',
+        title: 'Manage Book Copies',
         href: (bookEdition: BookEdition) => route('bookEditions.copies', bookEdition.id),
     }
 ];

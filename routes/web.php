@@ -13,11 +13,6 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
-
-
     Route::post('/leases', [LeaseController::class, 'store'])->name('leases.store');
     Route::get('/leases', [LeaseController::class, 'index'])->name('leases.index');
     Route::patch('/leases/{lease}', [LeaseController::class, 'update'])->name('leases.update');
@@ -31,7 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('book-editions/{bookEdition}', [BookEditionController::class, 'update'])->name('bookEditions.update');
 
     // Book
-    Route::get('/Books/create', [BookController::class, 'create'])->name('books.create');
+    Route::get('/books/create', [BookController::class, 'create'])->name('books.create');
     Route::get('/books/{book}/edit', [BookController::class, 'edit'])->name('books.edit');
 
     // BookEdition CRUD (librarian only, policy enforced)
