@@ -11,7 +11,7 @@ class UpdateBookCopyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check() && auth()->user()->role === 'librarian';
     }
 
     /**
@@ -22,7 +22,8 @@ class UpdateBookCopyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'barcode' => 'required|string|unique:book_copies,barcode,' . $this->route('bookCopy')->id,
+            'status' => 'required|in:available,leased,lost',
         ];
     }
 }

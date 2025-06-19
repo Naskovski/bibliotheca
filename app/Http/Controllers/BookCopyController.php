@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\BookCopy;
 use App\Http\Requests\StoreBookCopyRequest;
 use App\Http\Requests\UpdateBookCopyRequest;
+use Inertia\Inertia;
+use App\Models\BookEdition;
 
 class BookCopyController extends Controller
 {
@@ -27,9 +29,19 @@ class BookCopyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreBookCopyRequest $request)
+    public function store(StoreBookCopyRequest $request, BookEdition $bookEdition)
     {
-        //
+        $data = $request->validated();
+        $data['book_edition_id'] = $bookEdition->id;
+        BookCopy::create($data);
+
+        $bookEdition->load(['book.author', 'publisher']);
+        $copies = $bookEdition->bookCopies()->with(['bookEdition'])->get();
+
+        return Inertia::render('BookEditions/Copies', [
+            'bookEdition' => $bookEdition,
+            'copies' => $copies,
+        ]);
     }
 
     /**
@@ -53,7 +65,15 @@ class BookCopyController extends Controller
      */
     public function update(UpdateBookCopyRequest $request, BookCopy $bookCopy)
     {
-        //
+        $bookCopy->update($request->validated());
+
+        $bookEdition = $bookCopy->bookEdition()->with(['book.author', 'publisher'])->first();
+        $copies = $bookEdition->bookCopies()->with(['bookEdition'])->get();
+
+        return Inertia::render('BookEditions/Copies', [
+            'bookEdition' => $bookEdition,
+            'copies' => $copies,
+        ]);
     }
 
     /**
@@ -61,6 +81,14 @@ class BookCopyController extends Controller
      */
     public function destroy(BookCopy $bookCopy)
     {
-        //
+        $bookEdition = $bookCopy->bookEdition()->with(['book.author', 'publisher'])->first();
+        $bookCopy->delete();
+
+        $copies = $bookEdition->bookCopies()->with(['bookEdition'])->get();
+
+        return Inertia::render('BookEditions/Copies', [
+            'bookEdition' => $bookEdition,
+            'copies' => $copies,
+        ]);
     }
 }

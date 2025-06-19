@@ -150,4 +150,18 @@ class BookEditionController extends Controller
 
         return back()->with('success', 'Book requested successfully!');
     }
+
+    public function copies(BookEdition $bookEdition)
+    {
+        $bookEdition->load(['book.author', 'publisher']);
+
+        $copies = $bookEdition->bookCopies()
+            ->with(['bookEdition'])
+            ->get();
+
+        return \Inertia\Inertia::render('BookEditions/Copies', [
+            'bookEdition' => $bookEdition,
+            'copies' => $copies,
+        ]);
+    }
 }

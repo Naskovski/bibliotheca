@@ -4,7 +4,6 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { BookEdition, User } from '@/types/models';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { toast } from "sonner"
 
@@ -27,7 +26,7 @@ const adminLinks = [
     },
     {
         title: 'Edit Book Copies',
-        href: (bookEdition: BookEdition) => route('bookEditions.edit', bookEdition.id),
+        href: (bookEdition: BookEdition) => route('bookEditions.copies', bookEdition.id),
     }
 ];
 

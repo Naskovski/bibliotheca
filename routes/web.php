@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\BookCopyController;
 use App\Http\Controllers\BookEditionController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\LeaseController;
@@ -24,6 +25,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // BookEdition create/edit
     Route::get('/book-editions/create', [BookEditionController::class, 'create'])->name('bookEditions.create');
     Route::get('/book-editions/{bookEdition}/edit', [BookEditionController::class, 'edit'])->name('bookEditions.edit');
+    Route::get('/book-editions/{bookEdition}/copies', [BookEditionController::class, 'copies'])->name('bookEditions.copies');
     // BookEdition CRUD (librarian only, policy enforced)
     Route::post('book-editions', [BookEditionController::class, 'store'])->name('bookEditions.store');
     Route::put('book-editions/{bookEdition}', [BookEditionController::class, 'update'])->name('bookEditions.update');
@@ -35,6 +37,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // BookEdition CRUD (librarian only, policy enforced)
     Route::post('books', [BookController::class, 'store'])->name('books.store');
     Route::put('books/{book}', [BookController::class, 'update'])->name('books.update');
+
+    Route::post('/book-editions/{bookEdition}/copies', [BookCopyController::class, 'store']);
+    Route::put('/book-copies/{bookCopy}', [BookCopyController::class, 'update']);
+    Route::delete('/book-copies/{bookCopy}', [BookCopyController::class, 'destroy']);
 });
 
 require __DIR__.'/settings.php';
