@@ -25,6 +25,31 @@ export default function BookEditionCopies() {
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editBarcode, setEditBarcode] = useState('');
     const [editStatus, setEditStatus] = useState<'available' | 'leased' | 'lost'>('available');
+    const [sortBy, setSortBy] = useState<'id' | 'barcode' | 'status'>('id');
+    const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+    const handleSort = (column: 'id' | 'barcode' | 'status') => {
+        if (sortBy === column) {
+            setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortBy(column);
+            setSortDir('asc');
+        }
+    };
+
+    const sortedCopies = [...copies].sort((a, b) => {
+        let aValue = a[sortBy] ?? '';
+        let bValue = b[sortBy] ?? '';
+        if (typeof aValue === 'string') aValue = aValue.toLowerCase();
+        if (typeof bValue === 'string') bValue = bValue.toLowerCase();
+        if (aValue < bValue) return sortDir === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortDir === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    React.useEffect(() => {
+        setCopies(initialCopies);
+    }, [initialCopies]);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: bookEdition.book.title, href: `/book-editions/${bookEdition.id}` },
@@ -98,9 +123,15 @@ export default function BookEditionCopies() {
                             <table className="w-full text-sm text-left">
                                 <thead className="acrylic text-gray-200 uppercase text-xs">
                                 <tr>
-                                    <th className="px-4 py-3 border-b">ID</th>
-                                    <th className="px-4 py-3 border-b">Barcode</th>
-                                    <th className="px-4 py-3 border-b">Status</th>
+                                    <th className="px-4 py-3 border-b cursor-pointer" onClick={() => handleSort('id')}>
+                                        ID {sortBy === 'id' && (sortDir === 'asc' ? '▲' : '▼')}
+                                    </th>
+                                    <th className="px-4 py-3 border-b cursor-pointer" onClick={() => handleSort('barcode')}>
+                                        Barcode {sortBy === 'barcode' && (sortDir === 'asc' ? '▲' : '▼')}
+                                    </th>
+                                    <th className="px-4 py-3 border-b cursor-pointer" onClick={() => handleSort('status')}>
+                                        Status {sortBy === 'status' && (sortDir === 'asc' ? '▲' : '▼')}
+                                    </th>
                                     <th className="px-4 py-3 border-b text-center">Actions</th>
                                 </tr>
                                 </thead>
@@ -137,7 +168,7 @@ export default function BookEditionCopies() {
                                     </td>
                                 </tr>
 
-                                {copies.map((copy) => (
+                                {sortedCopies.map((copy) => (
                                     <tr key={copy.id} className="hover:bg-gray-50 hover:text-gray-700 dark:hover:bg-black dark:hover:text-gray-100">
                                         <td className="px-4 py-3 font-medium">{copy.id}</td>
                                         <td className="px-4 py-3">

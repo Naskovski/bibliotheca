@@ -17,6 +17,28 @@ export default function PublisherManage() {
     const [editAddress, setEditAddress] = useState('');
     const [editPhone, setEditPhone] = useState('');
 
+    const [sortBy, setSortBy] = useState<'id' | 'name' | 'address' | 'phone'>('id');
+    const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+    const handleSort = (column: 'id' | 'name' | 'address' | 'phone') => {
+        if (sortBy === column) {
+            setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortBy(column);
+            setSortDir('asc');
+        }
+    };
+
+    const sortedPublishers = [...publishers].sort((a, b) => {
+        let aValue = a[sortBy] ?? '';
+        let bValue = b[sortBy] ?? '';
+        if (typeof aValue === 'string') aValue = aValue.toLowerCase();
+        if (typeof bValue === 'string') bValue = bValue.toLowerCase();
+        if (aValue < bValue) return sortDir === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortDir === 'asc' ? 1 : -1;
+        return 0;
+    });
+
     // Sync state with props after reload
     React.useEffect(() => {
         setPublishers(propPublishers);
@@ -95,10 +117,18 @@ export default function PublisherManage() {
                         <table className="w-full text-sm text-left">
                             <thead className="acrylic text-gray-200 uppercase text-xs">
                                 <tr>
-                                    <th className="px-4 py-3 border-b">ID</th>
-                                    <th className="px-4 py-3 border-b">Name</th>
-                                    <th className="px-4 py-3 border-b">Address</th>
-                                    <th className="px-4 py-3 border-b">Phone</th>
+                                    <th className="px-4 py-3 border-b cursor-pointer" onClick={() => handleSort('id')}>
+                                        ID {sortBy === 'id' && (sortDir === 'asc' ? '▲' : '▼')}
+                                    </th>
+                                    <th className="px-4 py-3 border-b cursor-pointer" onClick={() => handleSort('name')}>
+                                        Name {sortBy === 'name' && (sortDir === 'asc' ? '▲' : '▼')}
+                                    </th>
+                                    <th className="px-4 py-3 border-b cursor-pointer" onClick={() => handleSort('address')}>
+                                        Address {sortBy === 'address' && (sortDir === 'asc' ? '▲' : '▼')}
+                                    </th>
+                                    <th className="px-4 py-3 border-b cursor-pointer" onClick={() => handleSort('phone')}>
+                                        Phone {sortBy === 'phone' && (sortDir === 'asc' ? '▲' : '▼')}
+                                    </th>
                                     <th className="px-4 py-3 border-b text-center">Actions</th>
                                 </tr>
                             </thead>
@@ -136,7 +166,7 @@ export default function PublisherManage() {
                                         </button>
                                     </td>
                                 </tr>
-                                {publishers.map((publisher) => (
+                                {sortedPublishers.map((publisher) => (
                                     <tr key={publisher.id} className="hover:bg-gray-50 hover:text-gray-700 dark:hover:bg-black dark:hover:text-gray-100">
                                         <td className="px-4 py-3 font-medium">{publisher.id}</td>
                                         <td className="px-4 py-3">

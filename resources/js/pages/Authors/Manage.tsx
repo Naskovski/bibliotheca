@@ -15,6 +15,32 @@ export default function AuthorManage() {
     const [editName, setEditName] = useState('');
     const [editBio, setEditBio] = useState('');
 
+    const [sortBy, setSortBy] = useState<'id' | 'name' | 'bio'>('id');
+    const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+    const handleSort = (column: 'id' | 'name' | 'bio') => {
+        if (sortBy === column) {
+            setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortBy(column);
+            setSortDir('asc');
+        }
+    };
+
+    const sortedAuthors = [...authors].sort((a, b) => {
+        let aValue = a[sortBy] ?? '';
+        let bValue = b[sortBy] ?? '';
+        if (typeof aValue === 'string') aValue = aValue.toLowerCase();
+        if (typeof bValue === 'string') bValue = bValue.toLowerCase();
+        if (aValue < bValue) return sortDir === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortDir === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    React.useEffect(() => {
+        setAuthors(initialAuthors);
+    }, [initialAuthors]);
+
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Manage Authors', href: '/authors/manage' },
     ];
@@ -83,9 +109,15 @@ export default function AuthorManage() {
                         <table className="w-full text-sm text-left">
                             <thead className="acrylic text-gray-200 uppercase text-xs">
                                 <tr>
-                                    <th className="px-4 py-3 border-b">ID</th>
-                                    <th className="px-4 py-3 border-b">Name</th>
-                                    <th className="px-4 py-3 border-b">Bio</th>
+                                    <th className="px-4 py-3 border-b cursor-pointer" onClick={() => handleSort('id')}>
+                                        ID {sortBy === 'id' && (sortDir === 'asc' ? '▲' : '▼')}
+                                    </th>
+                                    <th className="px-4 py-3 border-b cursor-pointer" onClick={() => handleSort('name')}>
+                                        Name {sortBy === 'name' && (sortDir === 'asc' ? '▲' : '▼')}
+                                    </th>
+                                    <th className="px-4 py-3 border-b cursor-pointer" onClick={() => handleSort('bio')}>
+                                        Bio {sortBy === 'bio' && (sortDir === 'asc' ? '▲' : '▼')}
+                                    </th>
                                     <th className="px-4 py-3 border-b text-center">Actions</th>
                                 </tr>
                             </thead>
@@ -116,7 +148,7 @@ export default function AuthorManage() {
                                         </button>
                                     </td>
                                 </tr>
-                                {authors.map((author) => (
+                                {sortedAuthors.map((author) => (
                                     <tr key={author.id} className="hover:bg-gray-50 hover:text-gray-700 dark:hover:bg-black dark:hover:text-gray-100">
                                         <td className="px-4 py-3 font-medium">{author.id}</td>
                                         <td className="px-4 py-3">
