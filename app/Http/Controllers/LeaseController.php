@@ -8,6 +8,8 @@ use App\Http\Requests\StoreLeaseRequest;
 use App\Http\Requests\UpdateLeaseRequest;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\LeaseStatusUpdated;
 
 class LeaseController extends Controller
 {
@@ -35,10 +37,6 @@ class LeaseController extends Controller
                     ->where('status', $status)
                     ->latest()
                     ->paginate(10, ['*'], $status . '_page');
-                \Log::info('Librarian leases paginated', [
-                    'status' => $status,
-                    'page' => request()->get($status . '_page', 1),
-                ]);
             }
         } else {
             \Log::warning('Unauthorized access to leases index', ['user_id' => $user->id]);
@@ -202,7 +200,20 @@ class LeaseController extends Controller
                     'lease_id' => $lease->id,
                     'new_status' => $lease->status,
                 ]);
-                return back()->with('success', 'Lease status updated successfully.');
+
+                if (isset($validated['status'])) {
+                    $lease->status = $validated['status'];
+                    $lease->save();
+
+                    $lease->load([
+                        'bookCopy.bookEdition.book.author',
+                        'client',
+                    ]);
+
+                    Mail::to($lease->client->email)->send(new LeaseStatusUpdated($lease));
+
+                    return back()->with('success', 'Lease status updated and notification sent.');
+                }
             }
             Log::warning('Unauthorized lease update attempt', [
                 'user_id' => $user->id,

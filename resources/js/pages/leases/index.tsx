@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { BookCard } from '@/components/book-card';
 import Scroller from '@/components/scroller';
 import { Lease } from '@/types/models';
@@ -21,7 +21,7 @@ const buttonStyles = {
 };
 
 export default function Index(props: any) {
-    const { patch, setData, processing } = useForm({ status: '' });
+    const [processing, setProcessing] = useState(false);
     const { auth } = usePage().props;
     const isLibrarian = auth.user?.role === 'librarian';
 
@@ -60,13 +60,20 @@ export default function Index(props: any) {
         const handleClick = (e: React.MouseEvent) => {
             e.stopPropagation();
             e.preventDefault();
-            setData('status', status);
-            patch(route('leases.update', lease.id), {
-                preserveScroll: true,
-                preserveState: true,
-                onSuccess: () => toast.success(`Lease successfully ${status}!`),
-                onError: () => toast.error('Failed to update lease.'),
-            });
+
+            setProcessing(true);
+
+            router.patch(
+                route('leases.update', lease.id),
+                { status },
+                {
+                    preserveScroll: true,
+                    preserveState: true,
+                    onSuccess: () => toast.success(`Lease successfully ${status}!`),
+                    onError: () => toast.error('Failed to update lease.'),
+                    onFinish: () => setProcessing(false),
+                }
+            );
         };
 
         return (
