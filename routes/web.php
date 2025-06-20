@@ -24,10 +24,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // BookEdition CRUD (librarian only, policy enforced)
     Route::post('book-editions', [BookEditionController::class, 'store'])->name('bookEditions.store');
     Route::put('book-editions/{bookEdition}', [BookEditionController::class, 'update'])->name('bookEditions.update');
+    Route::delete('book-editions/{bookEdition}', [BookEditionController::class, 'destroy'])->name('bookEditions.destroy');
 
     // Book
     Route::get('/books/create', [BookController::class, 'create'])->name('books.create');
     Route::get('/books/{book}/edit', [BookController::class, 'edit'])->name('books.edit');
+    Route::delete('/books/{book}', [BookController::class, 'destroy'])->name('books.destroy');
 
     // BookEdition CRUD (librarian only, policy enforced)
     Route::post('books', [BookController::class, 'store'])->name('books.store');

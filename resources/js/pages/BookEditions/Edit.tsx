@@ -34,10 +34,25 @@ export default function Edit() {
         router.put(`/book-editions/${bookEdition.id}`, data);
     };
 
+    const handleDelete = () => {
+        if (confirm('Are you sure you want to delete this book edition?')) {
+            router.delete(`/book-editions/${bookEdition.id}`);
+        }
+    };
+
     return (
         <AppLayout>
             <div className="max-w-xl mx-auto mt-8">
-                <h1 className="text-2xl font-bold mb-4">Edit Book Edition</h1>
+                <div className="flex justify-between items-center mb-4">
+                    <h1 className="text-2xl font-bold">Edit Book Edition</h1>
+                    <button
+                        type="button"
+                        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+                        onClick={handleDelete}
+                    >
+                        Delete Book Edition
+                    </button>
+                </div>
                 <Form fields={fields} onSubmit={handleSubmit} submitLabel="Update Book Edition" initialValues={bookEdition} />
             </div>
         </AppLayout>
