@@ -36,6 +36,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/book-editions/{bookEdition}/copies', [BookCopyController::class, 'store']);
     Route::put('/book-copies/{bookCopy}', [BookCopyController::class, 'update']);
     Route::delete('/book-copies/{bookCopy}', [BookCopyController::class, 'destroy']);
+
+    // Author CRUD (librarian only)
+    Route::post('/authors', [AuthorController::class, 'store']);
+    Route::put('/authors/{author}', [AuthorController::class, 'update']);
+    Route::delete('/authors/{author}', [AuthorController::class, 'destroy']);
 });
 
 require __DIR__.'/settings.php';

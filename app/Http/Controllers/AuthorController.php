@@ -16,7 +16,7 @@ class AuthorController extends Controller
     {
         $authors = Author::all();
 
-        return Inertia::render('Authors/Index', [
+        return Inertia::render('Authors/Manage', [
             'authors' => $authors
         ]);
     }
@@ -34,7 +34,11 @@ class AuthorController extends Controller
      */
     public function store(StoreAuthorRequest $request)
     {
-        //
+        $author = Author::create($request->validated());
+        $authors = Author::all();
+        return Inertia::render('Authors/Manage', [
+            'authors' => $authors
+        ]);
     }
 
     /**
@@ -58,7 +62,8 @@ class AuthorController extends Controller
      */
     public function update(UpdateAuthorRequest $request, Author $author)
     {
-        //
+        $author->update($request->validated());
+        return redirect('/authors')->with('success', 'Author updated successfully.');
     }
 
     /**
@@ -66,6 +71,7 @@ class AuthorController extends Controller
      */
     public function destroy(Author $author)
     {
-        //
+        $author->delete();
+        return redirect('/authors')->with('success', 'Author deleted successfully.');
     }
 }
