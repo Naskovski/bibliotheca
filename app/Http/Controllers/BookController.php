@@ -26,10 +26,8 @@ class BookController extends Controller
      */
     public function create(): \Inertia\Response
     {
-//        $authors = Author::all();
-
-        return Inertia::render('Books/New', [
-            'authors' => Author::all()
+        return Inertia::render('Books/Create', [
+            'authors' => Author::all(),
         ]);
     }
 
@@ -38,15 +36,11 @@ class BookController extends Controller
      */
     public function store(StoreBookRequest $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'first_published_date' => 'nullable|date',
-            'author_id' => 'required|exists:authors,id',
-        ]);
-
-        Book::create($request->all());
-
-        return redirect()->route('books.create')->with('success', 'Book created successfully!');
+        $data = $request->validated();
+        $data['created_at'] = now();
+        $data['updated_at'] = now();
+        Book::create($data);
+        return redirect()->route('books.index')->with('success', 'Book created successfully!');
     }
 
     /**
