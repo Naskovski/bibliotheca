@@ -31,7 +31,11 @@ export default function Edit() {
     ];
 
     const handleSubmit = (data: any) => {
-        router.put(`/book-editions/${bookEdition.id}`, data);
+        router.put(route('bookEditions.update', bookEdition.id), data, {
+            onSuccess: () => {
+                router.visit(route('bookEditions.show', bookEdition.id));
+            },
+        });
     };
 
     const handleDelete = () => {

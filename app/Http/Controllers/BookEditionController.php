@@ -149,7 +149,7 @@ class BookEditionController extends Controller
             'bookEdition' => $bookEdition->fresh(),
         ]);
 
-        return redirect()->route('books.index')->with('success', 'Book edition updated successfully.');
+        return redirect()->route('bookEditions.show', $bookEdition->id)->with('success', 'Book edition updated successfully.');
     }
 
     /**

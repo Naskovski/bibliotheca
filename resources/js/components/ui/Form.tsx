@@ -1,21 +1,17 @@
 import React from 'react';
 import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Check } from 'lucide-react';
 
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+} from '@/components/ui/command';
 
 export type FormField =
     | {
@@ -58,14 +54,9 @@ export const Form: React.FC<FormProps> = ({
                                               loading,
                                           }) => {
     const [form, setForm] = React.useState<Record<string, any>>(initialValues);
-    const [search, setSearch] = React.useState<Record<string, string>>({});
 
     const handleChange = (name: string, value: any) => {
         setForm((f) => ({ ...f, [name]: value }));
-    };
-
-    const handleSearch = (name: string, value: string) => {
-        setSearch((s) => ({ ...s, [name]: value }));
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -119,10 +110,7 @@ export const Form: React.FC<FormProps> = ({
                                         }
                                         onSelect={(date) => {
                                             if (date) {
-                                                handleChange(
-                                                    field.name,
-                                                    date.toISOString().split('T')[0]
-                                                );
+                                                handleChange(field.name, date.toISOString().split('T')[0]);
                                             }
                                         }}
                                         initialFocus
@@ -134,44 +122,51 @@ export const Form: React.FC<FormProps> = ({
                 }
 
                 if (field.type === 'select') {
-                    const options =
-                        field.searchable && search[field.name]
-                            ? field.options.filter((opt) =>
-                                opt.label
-                                    .toLowerCase()
-                                    .includes(search[field.name].toLowerCase())
-                            )
-                            : field.options;
+                    const selectedLabel = field.options.find(
+                        (opt) => opt.value.toString() === form[field.name]?.toString()
+                    )?.label;
 
                     return (
                         <div className="acrylic p-6 mb-3 rounded-lg" key={field.name}>
                             <label className="block font-medium mb-1">{field.label}</label>
-                            {field.searchable && (
-                                <input
-                                    type="text"
-                                    placeholder="Search..."
-                                    value={search[field.name] || ''}
-                                    onChange={(e) =>
-                                        handleSearch(field.name, e.target.value)
-                                    }
-                                    className="w-full px-3 py-2 rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 mb-2 transition"
-                                />
-                            )}
-                            <Select
-                                value={form[field.name]?.toString() || ''}
-                                onValueChange={(val) => handleChange(field.name, val)}
-                            >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {options.map((opt) => (
-                                        <SelectItem key={opt.value} value={opt.value.toString()}>
-                                            {opt.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <button
+                                        type="button"
+                                        className={cn(
+                                            'w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-left font-normal focus:outline-none focus:ring-2 focus:ring-blue-500 transition',
+                                            !selectedLabel && 'text-muted-foreground'
+                                        )}
+                                    >
+                                        {selectedLabel || 'Select...'}
+                                    </button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-full p-0">
+                                    <Command>
+                                        {field.searchable && <CommandInput placeholder="Search..." />}
+                                        <CommandEmpty>No results found.</CommandEmpty>
+                                        <CommandGroup className="max-h-64 overflow-y-auto">
+                                            {field.options.map((opt) => (
+                                                <CommandItem
+                                                    key={opt.value}
+                                                    value={opt.label.toLowerCase()}
+                                                    onSelect={() => handleChange(field.name, opt.value)}
+                                                >
+                                                    <Check
+                                                        className={cn(
+                                                            'mr-2 h-4 w-4',
+                                                            form[field.name]?.toString() === opt.value.toString()
+                                                                ? 'opacity-100'
+                                                                : 'opacity-0'
+                                                        )}
+                                                    />
+                                                    {opt.label}
+                                                </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
                         </div>
                     );
                 }

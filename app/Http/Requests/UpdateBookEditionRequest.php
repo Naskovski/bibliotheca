@@ -21,12 +21,28 @@ class UpdateBookEditionRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'book_id' => ['required', 'exists:books,id'],
-            'publisher_id' => ['required', 'exists:publishers,id'],
-            'isbn' => ['required', 'string', 'unique:book_editions,isbn'],
-            'published_date' => ['required', 'date'],
-            'photo_url' => ['nullable', 'string'],
-        ];
+        try {
+            \Log::info('UpdateBookEditionRequest rules called', [
+                'user_id' => $this->user()->id,
+                'request_data' => $this->all(),
+            ]);
+
+            return [
+                'book_id' => ['required', 'exists:books,id'],
+                'publisher_id' => ['required', 'exists:publishers,id'],
+                'isbn' => [
+                    'required',
+                    'string',
+                    'unique:book_editions,isbn,' . $this->route('bookEdition')->id,
+                ],
+                'published_date' => ['required', 'date'],
+                'photo_url' => ['nullable', 'string'],
+            ];
+        } catch (\Throwable $e) {
+            \Log::error('UpdateBookEditionRequest rules failed: ' . $e->getMessage(), [
+                'exception' => $e,
+            ]);
+            throw $e;
+        }
     }
 }
