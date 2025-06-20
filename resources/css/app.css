@@ -164,7 +164,7 @@
 }
 
 .acrylic {
-    backdrop-filter: blur(40px);
+    backdrop-filter: blur(12px);
     background: rgba(41, 41, 41, 0.55);
 }
 

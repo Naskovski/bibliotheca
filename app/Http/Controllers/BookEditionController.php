@@ -14,9 +14,40 @@ class BookEditionController extends Controller
      */
     public function index()
     {
-        $books = \App\Models\BookEdition::with(['book.author', 'publisher'])->paginate(15);
+        $query = \App\Models\BookEdition::with(['book.author', 'publisher']);
+
+        // Filters
+        $title = request('title');
+        $author_id = request('author_id');
+        $publisher_id = request('publisher_id');
+
+        if ($title) {
+            $query->whereHas('book', function ($q) use ($title) {
+                $q->where('title', 'like', "%$title%");
+            });
+        }
+        if ($author_id) {
+            $query->whereHas('book', function ($q) use ($author_id) {
+                $q->where('author_id', $author_id);
+            });
+        }
+        if ($publisher_id) {
+            $query->where('publisher_id', $publisher_id);
+        }
+
+        $books = $query->paginate(15)->appends(request()->all());
+        $authors = \App\Models\Author::all(['id', 'name']);
+        $publishers = \App\Models\Publisher::all(['id', 'name']);
+
         return \Inertia\Inertia::render('Books/Index', [
             'books' => $books,
+            'filters' => [
+                'title' => $title,
+                'author_id' => $author_id,
+                'publisher_id' => $publisher_id,
+            ],
+            'authors' => $authors,
+            'publishers' => $publishers,
         ]);
     }
 
