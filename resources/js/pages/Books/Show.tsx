@@ -164,7 +164,7 @@ export default function Show({ bookEdition, copies_left, otherEditionsOfBook, ot
                                     <div className="text-s mt-8 mb-4 tracking-wider text-gray-200 uppercase">
                                         Other books by <strong>{bookEdition.book.author.name}</strong>
                                     </div>
-                                    <Scroller variant={'vertical'}>
+                                    <Scroller variant={'horizontal'}>
                                         {otherBookEditionsByAuthor.map((edition) => (
                                             <BookCard bookEdition={edition} key={edition.id} size="small" />
                                         ))}
