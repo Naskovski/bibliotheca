@@ -4,7 +4,7 @@ import type { BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
-import { User } from '@/types/models';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink } from "@/components/ui/pagination";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -15,8 +15,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Index({ books }) {
     const { success } = usePage().props as { success?: string };
-
     const successShown = useRef(false);
+
     useEffect(() => {
         if (success && !successShown.current) {
             toast.success(<span className="text-green-900 dark:text-green-300">
@@ -34,17 +34,22 @@ export default function Index({ books }) {
                     ? books.data.map((bookEdition) => <BookCard key={bookEdition.id} bookEdition={bookEdition} />)
                     : 'no books found'}
             </section>
-            <nav className="mt-8 flex gap-2">
-                {books.links.map((link, idx) => (
-                    <button
-                        key={idx}
-                        disabled={!link.url}
-                        className={`rounded px-3 py-1 ${link.active ? 'bg-gray-800 text-white' : 'bg-gray-200'}`}
-                        onClick={() => link.url && router.visit(link.url)}
-                        dangerouslySetInnerHTML={{ __html: link.label }}
-                    />
-                ))}
-            </nav>
+
+            <div>
+                <Pagination>
+                    <PaginationContent className="acrylic rounded px-3">
+                        {books.links.map((link, idx) => (
+                            <PaginationItem key={idx}>
+                                <PaginationLink
+                                    isActive={link.active}
+                                    onClick={() => link.url && router.visit(link.url)}
+                                    dangerouslySetInnerHTML={{ __html: link.label }}
+                                />
+                            </PaginationItem>
+                        ))}
+                    </PaginationContent>
+                </Pagination>
+            </div>
         </AppLayout>
     );
 }
