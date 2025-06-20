@@ -13,7 +13,10 @@ class PublisherController extends Controller
      */
     public function index()
     {
-        //
+        $publishers = Publisher::all();
+        return \Inertia\Inertia::render('Publishers/Index', [
+            'publishers' => $publishers
+        ]);
     }
 
     /**
@@ -29,7 +32,11 @@ class PublisherController extends Controller
      */
     public function store(StorePublisherRequest $request)
     {
-        //
+        Publisher::create($request->validated());
+        $publishers = Publisher::all();
+        return \Inertia\Inertia::render('Publishers/Index', [
+            'publishers' => $publishers
+        ]);
     }
 
     /**
@@ -53,7 +60,8 @@ class PublisherController extends Controller
      */
     public function update(UpdatePublisherRequest $request, Publisher $publisher)
     {
-        //
+        $publisher->update($request->validated());
+        return redirect('/publishers')->with('success', 'Publisher updated successfully.');
     }
 
     /**
@@ -61,6 +69,7 @@ class PublisherController extends Controller
      */
     public function destroy(Publisher $publisher)
     {
-        //
+        $publisher->delete();
+        return redirect('/publishers')->with('success', 'Publisher deleted successfully.');
     }
 }

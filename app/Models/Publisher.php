@@ -9,4 +9,10 @@ class Publisher extends Model
 {
     /** @use HasFactory<\Database\Factories\PublisherFactory> */
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'address',
+        'phone',
+    ];
 }
